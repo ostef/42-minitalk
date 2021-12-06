@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 18:57:43 by soumanso          #+#    #+#             */
-/*   Updated: 2021/12/06 17:29:32 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2021/12/06 19:35:05 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,6 @@ int	main(int argc, t_str *args)
 		ft_fprintln (STDERR, "Invalid PID (%i).", (t_int)server_pid);
 		return (1);
 	}
-	send_string (server_pid, ft_read_entire_file ("testfile", ALLOC_TEMP));
+	send_string (server_pid, args[2]);
 	return (0);
 }
