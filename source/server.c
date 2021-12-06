@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 18:57:36 by soumanso          #+#    #+#             */
-/*   Updated: 2021/12/04 18:57:36 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2021/12/06 19:32:55 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,10 @@ static void	receive_bit(pid_t client_pid, t_u8 bit)
 
 	if (current_client != 0 && current_client != client_pid)
 	{
-		ft_fprintln (STDERR, "Received bit from another client"
-		"before the end of the stream.");
 		final_byte = 0;
 		bit_index = 0;
 	}
+	current_client = client_pid;
 	final_byte |= bit << bit_index;
 	bit_index += 1;
 	if (bit_index == 8)

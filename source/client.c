@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 18:57:43 by soumanso          #+#    #+#             */
-/*   Updated: 2021/12/04 18:57:43 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2021/12/06 17:29:32 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static void	send_byte(pid_t pid, t_u8 byte)
 	i = 0;
 	while (i < 8)
 	{
-		usleep (800);
+		usleep (100);
 		if ((byte & 0x01) == 0)
 			kill (pid, SIGUSR1);
 		else
@@ -32,28 +32,62 @@ static void	send_byte(pid_t pid, t_u8 byte)
 	}
 }
 
+static void	send_string(pid_t pid, t_str str)
+{
+	while (*str)
+	{
+		send_byte (pid, (t_u8)(*str));
+		str += 1;
+	}
+	send_byte (pid, 0);
+}
+
+static t_bool	parse_int(t_str str, t_int *out)
+{
+	t_u64	un;
+	t_int	sign;
+	t_s64	i;
+
+	i = 0;
+	un = 0;
+	sign = 1;
+	if (*str == '-' || *str == '+')
+	{
+		i += 1;
+		sign = (*str == '+') * 2 - 1;
+	}
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (FALSE);
+		un *= 10;
+		un += str[i] - '0';
+		i += 1;
+	}
+	if (out)
+		*out = un * sign;
+	return (TRUE);
+}
+
 int	main(int argc, t_str *args)
 {
 	pid_t	server_pid;
-	t_str	str;
 
 	if (argc != 3)
 	{
-		ft_println ("Usage: client server_pid string.");
+		ft_fprintln (STDERR, "Usage: client server_pid string");
 		return (1);
 	}
-	if (!ft_str_to_int (args[1], &server_pid))
+	if (!parse_int (args[1], &server_pid))
 	{
-		ft_println ("Expected an integer for argument 0.");
+		ft_fprintln (STDERR, "Expected an integer for argument 0.");
 		return (1);
 	}
-	//str = args[2];
-	str = ft_read_entire_file ("minitalk.h", ALLOC_TEMP);
-	while (*str)
+	if (server_pid < 0)
 	{
-		send_byte (server_pid, (t_u8)*str);
-		str += 1;
+		ft_fprintln (STDERR, "Invalid PID (%i).", (t_int)server_pid);
+		return (1);
 	}
-	send_byte (server_pid, 0);
+	send_string (server_pid, ft_read_entire_file ("testfile", ALLOC_TEMP));
 	return (0);
 }
